@@ -20,8 +20,35 @@ class Candidate(models.Model):
 
 class VoteRecord(models.Model):
     candidate = models.ForeignKey(Candidate, on_delete=models.CASCADE)
-    vote_count = models.IntegerField()
-    timestamp = models.DateTimeField(auto_now=True)
+    votes = models.IntegerField()
+    timestamp = models.DateTimeField(auto_now_add=True)
+
+    def save(self, *args, **kwargs):
+        from .models import Anomaly
+
+        is_new = self.pk is None
+        super().save(*args, **kwargs)
+
+        if not is_new:
+            return
+
+        previous_record = (
+            VoteRecord.objects
+            .filter(candidate=self.candidate)
+            .exclude(id=self.id)
+            .order_by('-id')
+            .first()
+        )
+
+        if previous_record:
+            if self.votes - previous_record.votes >= 100:
+                Anomaly.objects.create(
+                    candidate=self.candidate,
+                    previous_votes=previous_record.votes,
+                    current_votes=self.votes,
+                    reason="Sudden spike in vote count detected"
+                )
+
 
 class Anomaly(models.Model):
     candidate = models.ForeignKey(Candidate, on_delete=models.CASCADE)
