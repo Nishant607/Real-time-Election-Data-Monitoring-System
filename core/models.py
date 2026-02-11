@@ -24,8 +24,6 @@ class VoteRecord(models.Model):
     timestamp = models.DateTimeField(auto_now_add=True)
 
     def save(self, *args, **kwargs):
-        from .models import Anomaly
-
         is_new = self.pk is None
         super().save(*args, **kwargs)
 
@@ -40,14 +38,23 @@ class VoteRecord(models.Model):
             .first()
         )
 
-        if previous_record:
-            if self.votes - previous_record.votes >= 100:
-                Anomaly.objects.create(
-                    candidate=self.candidate,
-                    previous_votes=previous_record.votes,
-                    current_votes=self.votes,
-                    reason="Sudden spike in vote count detected"
-                )
+        if previous_record and self.votes - previous_record.votes >= 100:
+            anomaly = Anomaly.objects.create(
+                candidate=self.candidate,
+                previous_votes=previous_record.votes,
+                current_votes=self.votes,
+                reason="Sudden spike in vote count detected"
+            )
+
+            Alert.objects.create(
+                anomaly=anomaly,
+                message=f"High vote spike detected for {self.candidate.name}",
+                severity="High"
+            )
+
+    def __str__(self):
+        return f"{self.candidate.name} - {self.votes}"
+
 
 
 class Anomaly(models.Model):
@@ -59,3 +66,15 @@ class Anomaly(models.Model):
 
     def __str__(self):
         return self.reason
+
+
+
+class Alert(models.Model):
+    anomaly = models.ForeignKey(Anomaly, on_delete=models.CASCADE)
+    message = models.CharField(max_length=255)
+    severity = models.CharField(max_length=20, default="High")
+    created_at = models.DateTimeField(auto_now_add=True)
+    status = models.CharField(max_length=20, default="Active")
+
+    def __str__(self):
+        return self.message
