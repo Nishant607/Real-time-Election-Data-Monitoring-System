@@ -1,0 +1,36 @@
+{% load static %}
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Alerts Monitor</title>
+</head>
+
+<body>
+
+    <h1>System Alerts</h1>
+
+    <table border="1">
+        <tr>
+            <th>Candidate</th>
+            <th>Message</th>
+            <th>Severity</th>
+            <th>Status</th>
+            <th>Time</th>
+        </tr>
+
+        {% for alert in alerts %}
+        <tr>
+            <td>{{ alert.anomaly.candidate.name }}</td>
+            <td>{{ alert.message }}</td>
+            <td>{{ alert.severity }}</td>
+            <td>{{ alert.status }}</td>
+            <td>{{ alert.created_at }}</td>
+        </tr>
+        {% endfor %}
+
+    </table>
+
+</body>
+
+</html>

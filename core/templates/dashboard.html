@@ -8,28 +8,35 @@
     <link rel="stylesheet" href="{% static 'core/css/dashboard.css' %}">
     <script defer src="{% static 'core/js/dashboard.js' %}"></script>
 
+    <!-- Google Font -->
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;500;700&display=swap" rel="stylesheet">
+
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 
 <body>
 
+    <!-- SIDEBAR -->
     <div class="sidebar">
         <h2>Election Monitor</h2>
         <ul>
             <li>📊 Dashboard</li>
             <li>🗳 Elections</li>
             <li>👤 Candidates</li>
-            <li>⚠ Alerts</li>
+            <li><a href="/alerts/">⚠ Alerts</a></li>
             <li>🔍 Reports</li>
         </ul>
     </div>
 
+    <!-- MAIN CONTENT -->
     <div class="main">
 
         <div class="topbar">
             <h1>Real-Time Monitoring Dashboard</h1>
         </div>
 
+        <!-- CARDS -->
         <div class="cards">
 
             <div class="card blue">
@@ -54,6 +61,13 @@
 
         </div>
 
+        <!-- CHART SECTION -->
+        <div class="chart-container">
+            <h2>Vote Analytics</h2>
+            <canvas id="voteChart"></canvas>
+        </div>
+
+        <!-- ALERT SECTION -->
         <div class="alert-section">
             <h2>Recent Alerts</h2>
 
@@ -64,10 +78,48 @@
             {% empty %}
             <div class="no-alert">No recent alerts.</div>
             {% endfor %}
-
         </div>
 
     </div>
+
+    <!-- CHART SCRIPT -->
+    <script>
+        const ctx = document.getElementById('voteChart');
+
+        new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: ['Candidate A', 'Candidate B', 'Candidate C'],
+                datasets: [{
+                    label: 'Votes',
+                    data: [120, 190, 300],
+                    backgroundColor: [
+                        '#3498db',
+                        '#2ecc71',
+                        '#e74c3c'
+                    ]
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: {
+                        labels: {
+                            color: 'white'
+                        }
+                    }
+                },
+                scales: {
+                    y: {
+                        ticks: { color: 'white' }
+                    },
+                    x: {
+                        ticks: { color: 'white' }
+                    }
+                }
+            }
+        });
+    </script>
 
 </body>
 

@@ -12,3 +12,8 @@ def dashboard(request):
     return render(request, 'dashboard.html', context)
 
 
+def alerts_page(request):
+    alerts = Alert.objects.all().order_by('-created_at')
+    return render(request, 'alerts.html', {'alerts': alerts})
+
+
