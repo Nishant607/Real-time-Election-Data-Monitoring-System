@@ -138,3 +138,34 @@ body {
     border-radius: 15px;
     background: rgba(255, 255, 255, 0.05);
 }
+
+.candidate-section {
+    margin-top: 40px;
+}
+
+.vote-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 15px;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 10px;
+    overflow: hidden;
+}
+
+.vote-table th,
+.vote-table td {
+    padding: 12px;
+    text-align: center;
+}
+
+.vote-table th {
+    background: rgba(255, 255, 255, 0.1);
+}
+
+.vote-table tr {
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.vote-table tr:hover {
+    background: rgba(255, 255, 255, 0.08);
+}

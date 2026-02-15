@@ -79,6 +79,27 @@
             <div class="no-alert">No recent alerts.</div>
             {% endfor %}
         </div>
+        <div class="candidate-section">
+            <h2>Candidate Vote Summary</h2>
+
+            <table class="vote-table">
+                <tr>
+                    <th>Candidate</th>
+                    <th>Party</th>
+                    <th>Total Votes</th>
+                </tr>
+
+                {% for c in candidate_votes %}
+                <tr>
+                    <td>{{ c.name }}</td>
+                    <td>{{ c.party }}</td>
+                    <td>{{ c.total_votes|default:0 }}</td>
+                </tr>
+                {% endfor %}
+
+            </table>
+        </div>
+
 
     </div>
 
