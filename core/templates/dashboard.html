@@ -91,12 +91,15 @@
 
                 {% for c in candidate_votes %}
                 <tr>
-                    <td>{{ c.name }}</td>
-                    <td>{{ c.party }}</td>
-                    <td>{{ c.total_votes|default:0 }}</td>
+                    <td>{{ c.candidate__name }}</td>
+                    <td>{{ c.candidate__party }}</td>
+                    <td>{{ c.total_votes }}</td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="3">No vote data</td>
                 </tr>
                 {% endfor %}
-
             </table>
         </div>
 

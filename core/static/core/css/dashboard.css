@@ -131,39 +131,26 @@ body {
     border-radius: 10px;
 }
 
-/* CHART */
-.chart-container {
-    margin-top: 40px;
-    padding: 20px;
-    border-radius: 15px;
-    background: rgba(255, 255, 255, 0.05);
-}
 
-.candidate-section {
-    margin-top: 40px;
-}
+/* chart table */
 
 .vote-table {
     width: 100%;
     border-collapse: collapse;
-    margin-top: 15px;
+    margin-top: 20px;
     background: rgba(255, 255, 255, 0.05);
-    border-radius: 10px;
-    overflow: hidden;
+    backdrop-filter: blur(10px);
 }
 
 .vote-table th,
 .vote-table td {
     padding: 12px;
     text-align: center;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 .vote-table th {
     background: rgba(255, 255, 255, 0.1);
-}
-
-.vote-table tr {
-    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 .vote-table tr:hover {
