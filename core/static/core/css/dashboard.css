@@ -156,3 +156,19 @@ body {
 .vote-table tr:hover {
     background: rgba(255, 255, 255, 0.08);
 }
+
+
+
+.filter-box {
+    margin-bottom: 20px;
+}
+
+.filter-box select {
+    padding: 10px 15px;
+    border-radius: 8px;
+    border: none;
+    font-size: 16px;
+    background: white;
+    color: black;
+    cursor: pointer;
+}

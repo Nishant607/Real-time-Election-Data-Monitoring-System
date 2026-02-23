@@ -8,11 +8,10 @@
     <link rel="stylesheet" href="{% static 'core/css/dashboard.css' %}">
     <script defer src="{% static 'core/js/dashboard.js' %}"></script>
 
-    <!-- Google Font -->
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;500;700&display=swap" rel="stylesheet">
-
-    <!-- Chart.js -->
+    <!-- Chart.js CDN -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;500;700&display=swap" rel="stylesheet">
 </head>
 
 <body>
@@ -29,6 +28,7 @@
         </ul>
     </div>
 
+
     <!-- MAIN CONTENT -->
     <div class="main">
 
@@ -36,7 +36,8 @@
             <h1>Real-Time Monitoring Dashboard</h1>
         </div>
 
-        <!-- CARDS -->
+
+        <!-- STAT CARDS -->
         <div class="cards">
 
             <div class="card blue">
@@ -61,11 +62,36 @@
 
         </div>
 
-        <!-- CHART SECTION -->
+
+        <!-- ELECTION SELECTOR -->
         <div class="chart-container">
-            <h2>Vote Analytics</h2>
+
+            <h2>Select Election</h2>
+
+            <form method="get">
+                <select name="election" onchange="this.form.submit()">
+
+                    <option value="">All Elections</option>
+
+                    {% for e in elections_list %}
+                   <option value="{{ e.id }}"
+                  {% if selected_election_id == e.id %}selected{% endif %}>
+                    {{ e.name }}
+                    </option>
+                    {% endfor %}
+
+                </select>
+            </form>
+
+        </div>
+
+
+        <!-- CHART -->
+        <div class="chart-container">
+            <h2>Vote Distribution</h2>
             <canvas id="voteChart"></canvas>
         </div>
+
 
         <!-- ALERT SECTION -->
         <div class="alert-section">
@@ -78,72 +104,31 @@
             {% empty %}
             <div class="no-alert">No recent alerts.</div>
             {% endfor %}
-        </div>
-        <div class="candidate-section">
-            <h2>Candidate Vote Summary</h2>
 
-            <table class="vote-table">
-                <tr>
-                    <th>Candidate</th>
-                    <th>Party</th>
-                    <th>Total Votes</th>
-                </tr>
-
-                {% for c in candidate_votes %}
-                <tr>
-                    <td>{{ c.candidate__name }}</td>
-                    <td>{{ c.candidate__party }}</td>
-                    <td>{{ c.total_votes }}</td>
-                </tr>
-                {% empty %}
-                <tr>
-                    <td colspan="3">No vote data</td>
-                </tr>
-                {% endfor %}
-            </table>
         </div>
 
+
+ <div class="candidate-table">
+    <h2>Candidate Vote Summary</h2>
+    <table class="vote-table">
+        <tr>
+            <th>Candidate</th>
+            <th>Party</th>
+            <th>Total Votes</th>
+        </tr>
+
+        {% for c in candidate_votes %}
+        <tr>
+            <td>{{ c.candidate__name }}</td>
+            <td>{{ c.candidate__party }}</td>
+            <td>{{ c.total_votes }}</td>
+        </tr>
+        {% endfor %}
+    </table>
+</div>
 
     </div>
-
-    <!-- CHART SCRIPT -->
-    <script>
-        const ctx = document.getElementById('voteChart');
-
-        new Chart(ctx, {
-            type: 'bar',
-            data: {
-                labels: ['Candidate A', 'Candidate B', 'Candidate C'],
-                datasets: [{
-                    label: 'Votes',
-                    data: [120, 190, 300],
-                    backgroundColor: [
-                        '#3498db',
-                        '#2ecc71',
-                        '#e74c3c'
-                    ]
-                }]
-            },
-            options: {
-                responsive: true,
-                plugins: {
-                    legend: {
-                        labels: {
-                            color: 'white'
-                        }
-                    }
-                },
-                scales: {
-                    y: {
-                        ticks: { color: 'white' }
-                    },
-                    x: {
-                        ticks: { color: 'white' }
-                    }
-                }
-            }
-        });
-    </script>
+    
 
 </body>
 
