@@ -1,20 +1,21 @@
 document.addEventListener("DOMContentLoaded", function () {
 
     const ctx = document.getElementById('voteChart');
-
     if (!ctx) return;
 
     new Chart(ctx, {
         type: 'bar',
         data: {
-            labels: ['Candidate A', 'Candidate B', 'Candidate C'],
+            labels: chartLabels,
             datasets: [{
                 label: 'Votes',
-                data: [120, 190, 300],
+                data: chartData,
                 backgroundColor: [
                     '#3498db',
                     '#2ecc71',
-                    '#e74c3c'
+                    '#e74c3c',
+                    '#f39c12',
+                    '#9b59b6'
                 ]
             }]
         },

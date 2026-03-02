@@ -1,36 +1,53 @@
 {% load static %}
 <!DOCTYPE html>
 <html>
-
 <head>
     <title>Alerts Monitor</title>
+    <link rel="stylesheet" href="{% static 'core/css/dashboard.css' %}">
 </head>
 
 <body>
 
-    <h1>System Alerts</h1>
+<h1>🚨 System Alerts</h1>
 
-    <table border="1">
-        <tr>
-            <th>Candidate</th>
-            <th>Message</th>
-            <th>Severity</th>
-            <th>Status</th>
-            <th>Time</th>
-        </tr>
+<table class="vote-table">
+    <tr>
+        <th>Candidate</th>
+        <th>Message</th>
+        <th>Severity</th>
+        <th>Status</th>
+        <th>Time</th>
+        <th>Action</th>
+    </tr>
 
-        {% for alert in alerts %}
-        <tr>
-            <td>{{ alert.anomaly.candidate.name }}</td>
-            <td>{{ alert.message }}</td>
-            <td>{{ alert.severity }}</td>
-            <td>{{ alert.status }}</td>
-            <td>{{ alert.created_at }}</td>
-        </tr>
-        {% endfor %}
+    {% for alert in alerts %}
+    <tr class="
+        {% if alert.status == 'Resolved' %}resolved
+        {% elif alert.severity == 'High' %}high
+        {% elif alert.severity == 'Medium' %}medium
+        {% elif alert.severity == 'Low' %}low
+        {% endif %}
+    ">
 
-    </table>
+        <td>{{ alert.anomaly.candidate.name }}</td>
+        <td>{{ alert.message }}</td>
+        <td>{{ alert.severity }}</td>
+        <td>{{ alert.status }}</td>
+        <td>{{ alert.created_at }}</td>
+
+        <td>
+            {% if alert.status == 'Active' %}
+                <a href="{% url 'resolve_alert' alert.id %}" class="resolve-btn">
+                    Resolve
+                </a>
+            {% else %}
+                ✔
+            {% endif %}
+        </td>
+
+    </tr>
+    {% endfor %}
+</table>
 
 </body>
-
 </html>
