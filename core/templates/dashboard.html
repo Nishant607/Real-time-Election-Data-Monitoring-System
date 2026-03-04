@@ -99,6 +99,11 @@
             <h2>Vote Distribution</h2>
             <canvas id="voteChart"></canvas>
         </div>
+        {% if user.groups.all.0.name == "Admin" %}
+           <a href="{% url 'export_report' %}" class="report-btn">
+             Download Election Report (PDF)
+           </a>
+        {% endif %}
 
         <!-- ALERT SECTION -->
         <div class="alert-section">

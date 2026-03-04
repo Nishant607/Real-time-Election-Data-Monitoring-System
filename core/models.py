@@ -1,4 +1,6 @@
 from django.db import models
+from datetime import timedelta
+
 
 class Election(models.Model):
     name = models.CharField(max_length=100)
@@ -38,19 +40,34 @@ class VoteRecord(models.Model):
             .first()
         )
 
-        if previous_record and self.votes - previous_record.votes >= 100:
-            anomaly = Anomaly.objects.create(
-                candidate=self.candidate,
-                previous_votes=previous_record.votes,
-                current_votes=self.votes,
-                reason="Sudden spike in vote count detected"
-            )
+        if previous_record:
 
-            Alert.objects.create(
-                anomaly=anomaly,
-                message=f"High vote spike detected for {self.candidate.name}",
-                severity="High"
-            )
+            vote_diff = self.votes - previous_record.votes
+
+            # Percentage increase calculation
+            if previous_record.votes > 0:
+                percentage_increase = (vote_diff / previous_record.votes) * 100
+            else:
+                percentage_increase = 0
+
+            # Time difference calculation
+            time_diff = (self.timestamp - previous_record.timestamp).seconds
+
+            # Suspicious conditions
+            if percentage_increase >= 50 or time_diff < 60:
+
+                anomaly = Anomaly.objects.create(
+                    candidate=self.candidate,
+                    previous_votes=previous_record.votes,
+                    current_votes=self.votes,
+                    reason="Suspicious voting spike detected"
+                )
+
+                Alert.objects.create(
+                    anomaly=anomaly,
+                    message=f"Suspicious voting spike detected for {self.candidate.name}",
+                    severity="High"
+                )
 
     def __str__(self):
         return f"{self.candidate.name} - {self.votes}"

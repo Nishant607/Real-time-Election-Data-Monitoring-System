@@ -1,5 +1,7 @@
 from django.urls import path
 from .views import dashboard, alerts_page, resolve_alert, login_view, logout_view
+from .views import vote_data_api
+from .views import export_report_pdf
 
 urlpatterns = [
     path("", dashboard, name="dashboard"),
@@ -7,4 +9,6 @@ urlpatterns = [
     path("resolve/<int:alert_id>/", resolve_alert, name="resolve_alert"),
     path("login/", login_view, name="login"),
     path("logout/", logout_view, name="logout"),
+    path('api/votes/', vote_data_api, name='vote_api'),
+    path("export-report/", export_report_pdf, name="export_report"),
 ]

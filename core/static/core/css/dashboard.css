@@ -219,3 +219,37 @@ body {
 .resolve-btn:hover {
     background: #27ae60;
 }
+
+
+.filter-box{
+    margin:20px 0;
+}
+
+.filter-box select{
+    padding:8px;
+    margin-right:10px;
+    border-radius:6px;
+}
+
+.filter-box button{
+    padding:8px 14px;
+    border:none;
+    background:#4CAF50;
+    color:white;
+    border-radius:6px;
+    cursor:pointer;
+}
+
+.report-btn{
+    display:inline-block;
+    margin:20px 0;
+    padding:10px 16px;
+    background:#e67e22;
+    color:white;
+    border-radius:6px;
+    text-decoration:none;
+}
+
+.report-btn:hover{
+    background:#d35400;
+}
