@@ -253,3 +253,64 @@ body {
 .report-btn:hover{
     background:#d35400;
 }
+
+
+.activity-section {
+
+margin-top: 30px;
+
+background: rgba(255,255,255,0.05);
+
+padding: 25px;
+
+border-radius: 12px;
+
+backdrop-filter: blur(6px);
+
+box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+
+}
+
+
+.activity-section h2{
+color:white;
+margin-bottom:15px;
+}
+
+
+.activity-box {
+
+padding: 12px;
+
+border-bottom: 1px solid rgba(255,255,255,0.1);
+
+font-size: 14px;
+
+color: #e0e0e0;
+
+}
+
+
+.activity-box:last-child{
+border-bottom:none;
+}
+
+.search-box{
+display:flex;
+gap:10px;
+}
+
+.search-box input{
+padding:8px 12px;
+border-radius:6px;
+border:none;
+}
+
+.search-box button{
+padding:8px 12px;
+border:none;
+background:#3498db;
+color:white;
+border-radius:6px;
+cursor:pointer;
+}

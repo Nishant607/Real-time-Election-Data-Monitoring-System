@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Election, Candidate, VoteRecord, Anomaly, Alert
+from .models import Election, Candidate, VoteRecord, Anomaly, Alert, ActivityLog
 
 
 @admin.register(Election)
@@ -33,3 +33,10 @@ class AlertAdmin(admin.ModelAdmin):
     list_display = ('message', 'severity', 'status', 'created_at')
     list_filter = ('severity', 'status')
     search_fields = ('message',)
+
+
+@admin.register(ActivityLog)
+class ActivityLogAdmin(admin.ModelAdmin):
+    list_display = ('action', 'created_at')
+    list_filter = ('created_at',)
+    search_fields = ('action',)

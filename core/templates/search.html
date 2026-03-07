@@ -1,0 +1,49 @@
+{% load static %}
+
+<link rel="stylesheet" href="{% static 'core/css/dashboard.css' %}">
+
+<div class="main">
+
+<h1>Search Results</h1>
+
+<h2>Candidates</h2>
+
+{% for c in candidates %}
+
+<p>{{ c.name }} - {{ c.party }}</p>
+
+{% empty %}
+
+<p>No candidate found</p>
+
+{% endfor %}
+
+
+
+<h2>Elections</h2>
+
+{% for e in elections %}
+
+<p>{{ e.name }}</p>
+
+{% empty %}
+
+<p>No election found</p>
+
+{% endfor %}
+
+
+
+<h2>Alerts</h2>
+
+{% for a in alerts %}
+
+<p>{{ a.message }}</p>
+
+{% empty %}
+
+<p>No alerts found</p>
+
+{% endfor %}
+
+</div>

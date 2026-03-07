@@ -1,14 +1,27 @@
-from django.shortcuts import render
-from .models import Election, VoteRecord, Candidate, Alert
-from django.db.models import Sum
-from django.shortcuts import redirect , get_object_or_404
+from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import authenticate, login, logout
-from django.shortcuts import redirect
 from django.contrib.auth.models import Group
+from django.http import JsonResponse, HttpResponse
+from django.db.models import Sum
+from io import BytesIO
 
+from reportlab.platypus import SimpleDocTemplate, Table, TableStyle, Paragraph, Spacer
+from reportlab.lib.pagesizes import A4
+from reportlab.lib.styles import getSampleStyleSheet
+from reportlab.lib import colors
+
+from .models import Election, VoteRecord, Candidate, Alert
+from .models import ActivityLog
+from django.db.models import Q
+
+
+# ==============================
+# Dashboard
+# ==============================
 @login_required
 def dashboard(request):
+
     elections = Election.objects.all()
     selected_election_id = request.GET.get('election')
 
@@ -20,10 +33,10 @@ def dashboard(request):
         candidates = Candidate.objects.all()
         vote_records = VoteRecord.objects.all()
 
-    # 🔥 Total Votes
+    # Total Votes
     total_votes = vote_records.aggregate(total=Sum('votes'))['total'] or 0
 
-    # 🔥 Candidate Vote Aggregation
+    # Candidate Aggregation
     candidate_votes = (
         vote_records
         .values('candidate__id', 'candidate__name', 'candidate__party')
@@ -31,48 +44,47 @@ def dashboard(request):
         .order_by('-total_votes')
     )
 
-    # 🔥 Convert to list (important for modification)
     candidate_votes = list(candidate_votes)
 
-    # 🔥 Add Percentage
-    for c in candidate_votes:
+    # Add Rank + Percentage
+    for index, c in enumerate(candidate_votes, start=1):
+
+        c['rank'] = index
+
         if total_votes > 0:
             c['percentage'] = round((c['total_votes'] / total_votes) * 100, 2)
         else:
             c['percentage'] = 0
 
-    # 🔥 Leading Candidate
+    # Leading Candidate
     leading_candidate = candidate_votes[0] if candidate_votes else None
 
-    # 🔥 Chart Data
+    # Chart Data
     chart_labels = [c['candidate__name'] for c in candidate_votes]
     chart_data = [c['total_votes'] for c in candidate_votes]
+    recent_activity = ActivityLog.objects.order_by('-created_at')[:5]
 
     context = {
-        'elections': elections.count(),
-        'elections_list': elections,
-        'selected_election_id': int(selected_election_id) if selected_election_id else None,
-        'candidates': candidates.count(),
-        'votes': total_votes,
-        'alerts': Alert.objects.filter(status='Active').count(),
-        'recent_alerts': Alert.objects.order_by('-created_at')[:5],
-        'candidate_votes': candidate_votes,
-        'leading_candidate': leading_candidate,
-        'chart_labels': chart_labels,
-        'chart_data': chart_data
-    }
+    'elections': elections.count(),
+    'elections_list': elections,
+    'selected_election_id': int(selected_election_id) if selected_election_id else None,
+    'candidates': candidates.count(),
+    'votes': total_votes,
+    'alerts': Alert.objects.filter(status='Active').count(),
+    'recent_alerts': Alert.objects.order_by('-created_at')[:5],
+    'candidate_votes': candidate_votes,
+    'leading_candidate': leading_candidate,
+    'chart_labels': chart_labels,
+    'chart_data': chart_data,
+    'recent_activity': recent_activity
+}
 
     return render(request, 'dashboard.html', context)
 
 
-from django.contrib.auth.decorators import login_required
-
-from django.contrib.auth.decorators import login_required
-from .models import Alert
-
-from django.contrib.auth.decorators import login_required
-from .models import Alert
-
+# ==============================
+# Alerts Page
+# ==============================
 @login_required
 def alerts_page(request):
 
@@ -99,10 +111,12 @@ def alerts_page(request):
     return render(request, "alerts.html", context)
 
 
+# ==============================
+# Resolve Alert
+# ==============================
 @login_required
 def resolve_alert(request, alert_id):
 
-    # 🔐 Only Admin can resolve
     if not request.user.groups.filter(name='Admin').exists():
         return redirect('alerts')
 
@@ -110,37 +124,46 @@ def resolve_alert(request, alert_id):
     alert.status = "Resolved"
     alert.save()
 
+    ActivityLog.objects.create(
+        action=f"Alert resolved for {alert.anomaly.candidate.name}"
+    )
+
     return redirect('alerts')
 
 
-
+# ==============================
+# Login
+# ==============================
 def login_view(request):
+
     if request.method == "POST":
+
         username = request.POST.get("username")
         password = request.POST.get("password")
 
         user = authenticate(request, username=username, password=password)
 
-        if user is not None:
+        if user:
             login(request, user)
             return redirect('dashboard')
-        else:
-            return render(request, 'login.html', {'error': 'Invalid Credentials'})
 
-    return render(request, 'login.html')
+        return render(request, "login.html", {"error": "Invalid Credentials"})
+
+    return render(request, "login.html")
 
 
+# ==============================
+# Logout
+# ==============================
 def logout_view(request):
+
     logout(request)
     return redirect('login')
 
 
-
-
-from django.http import JsonResponse
-from django.db.models import Sum
-from .models import VoteRecord
-
+# ==============================
+# Vote Data API (for chart auto update)
+# ==============================
 def vote_data_api(request):
 
     data = (
@@ -162,22 +185,12 @@ def vote_data_api(request):
     })
 
 
-    
-from django.http import HttpResponse
-from django.contrib.auth.decorators import login_required
-from django.db.models import Sum
-from reportlab.platypus import SimpleDocTemplate, Table, TableStyle, Paragraph, Spacer
-from reportlab.lib.pagesizes import A4
-from reportlab.lib.styles import getSampleStyleSheet
-from reportlab.lib import colors
-from io import BytesIO
-from .models import VoteRecord
-
-
+# ==============================
+# Export Election Report PDF
+# ==============================
 @login_required
 def export_report_pdf(request):
 
-    # Only Admin group can export
     if not request.user.groups.filter(name='Admin').exists():
         return HttpResponse("Unauthorized", status=403)
 
@@ -189,16 +202,16 @@ def export_report_pdf(request):
     elements = []
 
     elements.append(Paragraph("Election Vote Report", styles['Title']))
-    elements.append(Spacer(1,20))
+    elements.append(Spacer(1, 20))
 
     data = (
         VoteRecord.objects
-        .values('candidate__name','candidate__party')
+        .values('candidate__name', 'candidate__party')
         .annotate(total_votes=Sum('votes'))
         .order_by('-total_votes')
     )
 
-    table_data = [["Candidate","Party","Total Votes"]]
+    table_data = [["Candidate", "Party", "Total Votes"]]
 
     for row in data:
         table_data.append([
@@ -210,10 +223,10 @@ def export_report_pdf(request):
     table = Table(table_data)
 
     table.setStyle(TableStyle([
-        ("BACKGROUND",(0,0),(-1,0),colors.grey),
-        ("TEXTCOLOR",(0,0),(-1,0),colors.white),
-        ("GRID",(0,0),(-1,-1),1,colors.black),
-        ("ALIGN",(2,1),(2,-1),"CENTER")
+        ("BACKGROUND", (0, 0), (-1, 0), colors.grey),
+        ("TEXTCOLOR", (0, 0), (-1, 0), colors.white),
+        ("GRID", (0, 0), (-1, -1), 1, colors.black),
+        ("ALIGN", (2, 1), (2, -1), "CENTER")
     ]))
 
     elements.append(table)
@@ -223,7 +236,83 @@ def export_report_pdf(request):
     pdf = buffer.getvalue()
     buffer.close()
 
-    response = HttpResponse(pdf,content_type="application/pdf")
+    response = HttpResponse(pdf, content_type="application/pdf")
     response["Content-Disposition"] = 'attachment; filename="election_report.pdf"'
 
     return response
+
+
+
+
+
+@login_required
+def analytics_page(request):
+
+    analytics_data = (
+        VoteRecord.objects
+        .values('candidate__name')
+        .annotate(total_votes=Sum('votes'))
+        .order_by('-total_votes')
+    )
+
+    labels = []
+    votes = []
+
+    for item in analytics_data:
+        labels.append(item['candidate__name'])
+        votes.append(item['total_votes'])
+
+    total_votes = sum(votes)
+
+    total_candidates = len(analytics_data)
+
+    leader = analytics_data[0]['candidate__name'] if analytics_data else "N/A"
+
+    context = {
+        "labels": labels,
+        "votes": votes,
+        "analytics_data": analytics_data,
+        "total_votes": total_votes,
+        "total_candidates": total_candidates,
+        "leader": leader
+    }
+
+    return render(request,"analytics.html",context)
+
+
+
+
+
+
+@login_required
+def search_page(request):
+
+    query = request.GET.get("q")
+
+    candidates = []
+    elections = []
+    alerts = []
+
+    if query:
+
+        candidates = Candidate.objects.filter(
+            Q(name__icontains=query) |
+            Q(party__icontains=query)
+        )
+
+        elections = Election.objects.filter(
+            name__icontains=query
+        )
+
+        alerts = Alert.objects.filter(
+            message__icontains=query
+        )
+
+    context = {
+        "query": query,
+        "candidates": candidates,
+        "elections": elections,
+        "alerts": alerts
+    }
+
+    return render(request,"search.html",context)

@@ -1,0 +1,158 @@
+{% load static %}
+<!DOCTYPE html>
+<html>
+
+<head>
+
+<title>Election Analytics</title>
+
+<link rel="stylesheet" href="{% static 'core/css/dashboard.css' %}">
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+</head>
+
+<body>
+
+<!-- SIDEBAR -->
+<div class="sidebar">
+
+<h2>Election Monitor</h2>
+
+<ul>
+<li><a href="/">📊 Dashboard</a></li>
+<li><a href="/alerts/">⚠ Alerts</a></li>
+<li><a href="/analytics/">📈 Analytics</a></li>
+<li><a href="/logout/">🚪 Logout</a></li>
+</ul>
+
+</div>
+
+
+
+<div class="main">
+
+<h1>Election Analytics</h1>
+
+
+<!-- STAT CARDS -->
+
+<div class="cards">
+
+<div class="card blue">
+<h3>Total Votes</h3>
+<p>{{ total_votes }}</p>
+</div>
+
+<div class="card green">
+<h3>Total Candidates</h3>
+<p>{{ total_candidates }}</p>
+</div>
+
+<div class="card orange">
+<h3>Leading Candidate</h3>
+<p>{{ leader }}</p>
+</div>
+
+</div>
+
+
+
+<!-- CHART -->
+
+<div class="chart-container">
+
+<h2>Candidate Vote Comparison</h2>
+
+<canvas id="analyticsChart"></canvas>
+
+</div>
+
+
+
+<!-- ANALYTICS TABLE -->
+
+<div class="candidate-table">
+
+<h2>Candidate Performance</h2>
+
+<table class="vote-table">
+
+<tr>
+<th>Rank</th>
+<th>Candidate</th>
+<th>Total Votes</th>
+</tr>
+
+{% for c in analytics_data %}
+
+<tr>
+
+<td>
+
+{% if forloop.first %}
+🥇
+{% elif forloop.counter == 2 %}
+🥈
+{% elif forloop.counter == 3 %}
+🥉
+{% else %}
+{{ forloop.counter }}
+{% endif %}
+
+</td>
+
+<td>{{ c.candidate__name }}</td>
+
+<td>{{ c.total_votes }}</td>
+
+</tr>
+
+{% endfor %}
+
+</table>
+
+</div>
+
+</div>
+
+
+<script>
+
+const labels = {{ labels|safe }}
+const votes = {{ votes|safe }}
+
+const ctx = document.getElementById("analyticsChart")
+
+new Chart(ctx,{
+
+type:"bar",
+
+data:{
+labels:labels,
+datasets:[{
+
+label:"Total Votes",
+
+data:votes,
+
+backgroundColor:[
+"#3498db",
+"#2ecc71",
+"#f39c12",
+"#e74c3c",
+"#9b59b6"
+]
+
+}]
+},
+
+options:{
+responsive:true
+}
+
+})
+
+</script>
+
+</body>
+</html>

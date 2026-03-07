@@ -2,6 +2,8 @@ from django.urls import path
 from .views import dashboard, alerts_page, resolve_alert, login_view, logout_view
 from .views import vote_data_api
 from .views import export_report_pdf
+from .views import analytics_page
+from .views import search_page
 
 urlpatterns = [
     path("", dashboard, name="dashboard"),
@@ -11,4 +13,6 @@ urlpatterns = [
     path("logout/", logout_view, name="logout"),
     path('api/votes/', vote_data_api, name='vote_api'),
     path("export-report/", export_report_pdf, name="export_report"),
+    path("analytics/", analytics_page, name="analytics"),
+    path("search/", search_page, name="search"),
 ]
