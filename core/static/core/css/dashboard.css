@@ -298,6 +298,7 @@ border-bottom:none;
 .search-box{
 display:flex;
 gap:10px;
+margin-bottom: 30px;
 }
 
 .search-box input{

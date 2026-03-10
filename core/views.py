@@ -316,3 +316,61 @@ def search_page(request):
     }
 
     return render(request,"search.html",context)
+
+
+@login_required
+def elections_page(request):
+
+    elections = Election.objects.all()
+
+    return render(request,"elections.html",{
+        "elections":elections
+    })
+
+
+@login_required
+def candidates_page(request):
+
+    candidate_votes = (
+        VoteRecord.objects
+        .values('candidate__id','candidate__name','candidate__party')
+        .annotate(total_votes=Sum('votes'))
+        .order_by('-total_votes')
+    )
+
+    candidate_votes = list(candidate_votes)
+
+    total_votes = sum(c['total_votes'] for c in candidate_votes)
+
+    for i, c in enumerate(candidate_votes):
+        c['rank'] = i + 1
+        c['percentage'] = round((c['total_votes'] / total_votes) * 100,2) if total_votes else 0
+
+    chart_labels = [c['candidate__name'] for c in candidate_votes]
+    chart_data = [c['total_votes'] for c in candidate_votes]
+
+    context = {
+        "candidates": candidate_votes,
+        "chart_labels": chart_labels,
+        "chart_data": chart_data
+    }
+
+    return render(request,"candidates.html",context)
+
+
+@login_required
+def reports_page(request):
+
+    total_elections = Election.objects.count()
+    total_candidates = Candidate.objects.count()
+    total_votes = VoteRecord.objects.aggregate(total=Sum('votes'))['total'] or 0
+    total_alerts = Alert.objects.count()
+
+    context = {
+        "elections": total_elections,
+        "candidates": total_candidates,
+        "votes": total_votes,
+        "alerts": total_alerts
+    }
+
+    return render(request,"reports.html",context)

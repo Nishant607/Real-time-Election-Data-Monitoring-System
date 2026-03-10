@@ -1,0 +1,113 @@
+{% load static %}
+<!DOCTYPE html>
+<html>
+
+<head>
+
+<title>Reports Dashboard</title>
+
+<link rel="stylesheet" href="{% static 'core/css/dashboard.css' %}">
+
+</head>
+
+<body>
+
+<div class="sidebar">
+
+<h2>Election Monitor</h2>
+
+<ul>
+<li><a href="/">📊 Dashboard</a></li>
+<li><a href="/elections/">🗳 Elections</a></li>
+<li><a href="/candidates/">👤 Candidates</a></li>
+<li><a href="/alerts/">⚠ Alerts</a></li>
+<li><a href="/analytics/">📈 Analytics</a></li>
+<li><a href="/reports/">🔍 Reports</a></li>
+<li><a href="/logout/">🚪 Logout</a></li>
+</ul>
+
+</div>
+
+
+
+<div class="main">
+
+<h1>📄 Reports Dashboard</h1>
+
+
+<!-- STAT CARDS -->
+
+<div class="cards">
+
+<div class="card blue">
+<h3>Total Elections</h3>
+<p>{{ elections }}</p>
+</div>
+
+<div class="card green">
+<h3>Total Candidates</h3>
+<p>{{ candidates }}</p>
+</div>
+
+<div class="card orange">
+<h3>Total Votes</h3>
+<p>{{ votes }}</p>
+</div>
+
+<div class="card red">
+<h3>Total Alerts</h3>
+<p>{{ alerts }}</p>
+</div>
+
+</div>
+
+
+
+<!-- REPORT ACTIONS -->
+
+<div class="candidate-table">
+
+<h2>Download Reports</h2>
+
+<table class="vote-table">
+
+<tr>
+<th>Report</th>
+<th>Action</th>
+</tr>
+
+<tr>
+<td>Election Vote Report</td>
+<td>
+<a href="{% url 'export_report' %}" class="report-btn">
+Download PDF
+</a>
+</td>
+</tr>
+
+<tr>
+<td>Alerts Report</td>
+<td>
+<button class="report-btn">
+Generate
+</button>
+</td>
+</tr>
+
+<tr>
+<td>Candidate Ranking</td>
+<td>
+<button class="report-btn">
+Generate
+</button>
+</td>
+</tr>
+
+</table>
+
+</div>
+
+</div>
+
+</body>
+</html>

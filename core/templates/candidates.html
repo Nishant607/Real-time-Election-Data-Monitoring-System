@@ -1,0 +1,167 @@
+{% load static %}
+<!DOCTYPE html>
+<html>
+
+<head>
+
+<title>Candidates Analytics</title>
+
+<link rel="stylesheet" href="{% static 'core/css/dashboard.css' %}">
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+</head>
+
+<body>
+
+<div class="sidebar">
+
+<h2>Election Monitor</h2>
+
+<ul>
+<li><a href="/">📊 Dashboard</a></li>
+<li><a href="/elections/">🗳 Elections</a></li>
+<li><a href="/candidates/">👤 Candidates</a></li>
+<li><a href="/alerts/">⚠ Alerts</a></li>
+<li><a href="/analytics/">📈 Analytics</a></li>
+<li><a href="/logout/">🚪 Logout</a></li>
+</ul>
+
+</div>
+
+
+
+<div class="main">
+
+<h1>👤 Candidate Performance</h1>
+
+
+<!-- CHART -->
+
+<div class="chart-container">
+
+<h2>Vote Comparison</h2>
+
+<canvas id="candidateChart"></canvas>
+
+</div>
+
+
+
+<!-- TABLE -->
+
+<div class="candidate-table">
+
+<h2>Candidate Ranking</h2>
+
+<table class="vote-table">
+
+<tr>
+<th>Rank</th>
+<th>Candidate</th>
+<th>Party</th>
+<th>Total Votes</th>
+<th>Vote Share</th>
+</tr>
+
+{% for c in candidates %}
+
+<tr>
+
+<td>
+
+{% if c.rank == 1 %}
+🥇
+{% elif c.rank == 2 %}
+🥈
+{% elif c.rank == 3 %}
+🥉
+{% else %}
+{{ c.rank }}
+{% endif %}
+
+</td>
+
+<td>{{ c.candidate__name }}</td>
+
+<td>{{ c.candidate__party }}</td>
+
+<td>{{ c.total_votes }}</td>
+
+<td>
+
+<div class="percentage-text">
+{{ c.percentage }}%
+</div>
+
+<div class="progress-bar">
+
+<div class="progress-fill"
+style="width: {{ c.percentage }}%;">
+
+</div>
+
+</div>
+
+</td>
+
+</tr>
+
+{% endfor %}
+
+</table>
+
+</div>
+
+</div>
+
+
+
+{{ chart_labels|json_script:"chart-labels" }}
+{{ chart_data|json_script:"chart-data" }}
+
+<script>
+
+const labels = JSON.parse(
+document.getElementById("chart-labels").textContent
+)
+
+const votes = JSON.parse(
+document.getElementById("chart-data").textContent
+)
+
+const ctx = document.getElementById("candidateChart")
+
+new Chart(ctx,{
+
+type:"bar",
+
+data:{
+labels:labels,
+
+datasets:[{
+label:"Votes",
+data:votes,
+
+backgroundColor:[
+"#3498db",
+"#2ecc71",
+"#e74c3c",
+"#f39c12",
+"#9b59b6"
+]
+
+}]
+},
+
+options:{
+responsive:true
+}
+
+})
+
+</script>
+
+
+</body>
+</html>
