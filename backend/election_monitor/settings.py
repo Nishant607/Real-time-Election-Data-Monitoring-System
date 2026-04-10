@@ -25,7 +25,7 @@ SECRET_KEY = 'django-insecure-%_@9s3wghh=6$r-9_%%ry#y($aasmyi#^cs23q%cr)7%##^&*)
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['*']
 
 
 # Application definition
@@ -143,19 +143,15 @@ EMAIL_HOST_PASSWORD = 'xcwk scxc oqjy amwa'
 
 DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
 
-# CORS & REST Framework Config
-CORS_ALLOWED_ORIGINS = [
-    "http://localhost:5173",
-    "http://localhost:5174",
-    "http://127.0.0.1:5173",
-    "http://127.0.0.1:5174",
-]
+CORS_ALLOW_ALL_ORIGINS = True
 CORS_ALLOW_CREDENTIALS = True
 CSRF_TRUSTED_ORIGINS = [
     "http://localhost:5173",
     "http://localhost:5174",
     "http://127.0.0.1:5173",
     "http://127.0.0.1:5174",
+    "https://*.vercel.app",
+    "https://*.onrender.com",
 ]
 
 REST_FRAMEWORK = {
