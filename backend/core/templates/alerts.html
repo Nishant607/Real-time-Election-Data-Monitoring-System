@@ -1,0 +1,131 @@
+{% load static %}
+<!DOCTYPE html>
+<html>
+<head>
+    <title>System Alerts</title>
+
+    <link rel="stylesheet" href="{% static 'core/css/dashboard.css' %}">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;500;700&display=swap" rel="stylesheet">
+</head>
+
+<body>
+
+<!-- SIDEBAR -->
+<div class="sidebar">
+    <h2>Election Monitor</h2>
+    <ul>
+        <li><a href="{% url 'dashboard' %}">📊 Dashboard</a></li>
+        <li>🗳 Elections</li>
+        <li>👤 Candidates</li>
+        <li class="active"><a href="/alerts/">⚠ Alerts</a></li>
+        <li>🔍 Reports</li>
+        <li><a href="{% url 'logout' %}">🚪 Logout</a></li>
+    </ul>
+</div>
+
+<!-- MAIN -->
+<div class="main">
+
+    <div class="topbar">
+        <h1>🚨 System Alerts</h1>
+        
+    </div>
+    <div class="filter-box">
+
+<form method="get">
+
+<select name="status">
+
+<option value="All">All Status</option>
+
+<option value="Active"
+{% if selected_status == "Active" %}selected{% endif %}>
+Active
+</option>
+
+<option value="Resolved"
+{% if selected_status == "Resolved" %}selected{% endif %}>
+Resolved
+</option>
+
+</select>
+
+<select name="severity">
+
+<option value="All">All Severity</option>
+
+<option value="High"
+{% if selected_severity == "High" %}selected{% endif %}>
+High
+</option>
+
+<option value="Medium"
+{% if selected_severity == "Medium" %}selected{% endif %}>
+Medium
+</option>
+
+<option value="Low"
+{% if selected_severity == "Low" %}selected{% endif %}>
+Low
+</option>
+
+</select>
+
+<button type="submit">Filter</button>
+
+</form>
+
+</div>
+
+    <div class="table-wrapper">
+
+        <table class="vote-table">
+            <thead>
+                <tr>
+                    <th>Candidate</th>
+                    <th>Message</th>
+                    <th>Severity</th>
+                    <th>Status</th>
+                    <th>Time</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+
+            <tbody>
+                {% for alert in alerts %}
+                <tr>
+                    <td>{{ alert.candidate.name }}</td>
+                    <td>{{ alert.message }}</td>
+                    <td>{{ alert.severity }}</td>
+                    <td>{{ alert.status }}</td>
+                    <td>{{ alert.created_at|date:"M d, Y - H:i" }}</td>
+                    <td>
+                        {% if is_admin %}
+                            {% if alert.status == "Active" %}
+                                <a href="{% url 'alert_detail' alert.id %}" class="resolve-btn" style="background: linear-gradient(135deg, var(--accent-blue), #2563eb);">
+                                    Investigate
+                                </a>
+                            {% else %}
+                                ✔ {{ alert.action_taken|default:"" }}
+                            {% endif %}
+                        {% else %}
+                            🔒
+                        {% endif %}
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="6" style="text-align:center;">
+                        No alerts found
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
+    </div>
+
+</div>
+
+</body>
+</html>

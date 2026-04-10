@@ -1,0 +1,104 @@
+{% load static %}
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Report Hub</title>
+    <link rel="stylesheet" href="{% static 'core/css/dashboard.css' %}">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        .report-card {
+            background: linear-gradient(180deg, rgba(30, 41, 59, 0.8) 0%, rgba(15, 23, 42, 0.9) 100%);
+            border: 1px solid var(--glass-border);
+            border-top: 4px solid var(--accent-blue);
+            border-radius: 20px;
+            padding: 30px;
+            transition: all 0.3s ease;
+            text-align: center;
+        }
+
+        .report-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 35px rgba(0,0,0,0.4);
+            border-top-color: var(--accent-orange);
+        }
+
+        .report-icon {
+            font-size: 48px;
+            margin-bottom: 20px;
+            display: inline-block;
+        }
+
+        .btn-export-massive {
+            display: inline-block;
+            background: linear-gradient(135deg, var(--accent-blue), #2563eb);
+            color: white;
+            padding: 12px 30px;
+            border-radius: 10px;
+            text-decoration: none;
+            font-weight: 600;
+            margin-top: 20px;
+            transition: opacity 0.3s;
+        }
+
+        .btn-export-massive:hover {
+            opacity: 0.9;
+        }
+        
+        .grid-container {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 30px;
+            max-width: 900px;
+            margin: 40px auto;
+        }
+    </style>
+</head>
+<body>
+
+<div class="sidebar">
+    <h2>Election Monitor</h2>
+    <ul>
+        <li><a href="{% url 'dashboard' %}">📊 Dashboard</a></li>
+        <li><a href="/elections/">🗳 Elections</a></li>
+        <li><a href="/candidates/">👤 Candidates</a></li>
+        <li><a href="/alerts/">⚠ Alerts</a></li>
+        <li><a href="/analytics/">📈 Analytics</a></li>
+        <li class="active"><a href="/reports/">🔍 Reports</a></li>
+        <li><a href="{% url 'logout' %}">🚪 Logout</a></li>
+    </ul>
+</div>
+
+<div class="main">
+    <div class="topbar">
+        <h1>🔍 Central Report Hub</h1>
+        <p style="color: #94a3b8; font-size: 15px; margin: 0;">Generate and download certified system reporting documents.</p>
+    </div>
+
+    <div class="grid-container">
+        
+        <!-- Primary Election Report -->
+        <div class="report-card">
+            <span class="report-icon">🗳</span>
+            <h2 style="color: white; margin-bottom: 10px;">Official Election Result Report</h2>
+            <p style="color: #94a3b8; font-size: 14px; line-height: 1.6;">
+                Downloads a certified PDF document containing the aggregate voting results for all active candidates, broken down by political party and ranking.
+            </p>
+            <a href="{% url 'export_report' %}" class="btn-export-massive">Download PDF Result</a>
+        </div>
+
+        <!-- Security Audit Log (Hypothetical functionality linked to alert exports) -->
+        <div class="report-card" style="border-top-color: var(--accent-red);">
+            <span class="report-icon">🛡</span>
+            <h2 style="color: white; margin-bottom: 10px;">System Integrity & Alerts Log</h2>
+            <p style="color: #94a3b8; font-size: 14px; line-height: 1.6;">
+                Security logging framework. Navigate to the individual Alert Investigation pages to export specific incident PDF reports.
+            </p>
+            <a href="{% url 'alerts' %}" class="btn-export-massive" style="background: linear-gradient(135deg, var(--accent-red), #b91c1c);">View Alerts</a>
+        </div>
+
+    </div>
+
+</div>
+
+</body>
+</html>

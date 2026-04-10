@@ -1,0 +1,95 @@
+{% load static %}
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Candidate Roster</title>
+    <link rel="stylesheet" href="{% static 'core/css/dashboard.css' %}">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+
+<div class="sidebar">
+    <h2>Election Monitor</h2>
+    <ul>
+        <li><a href="{% url 'dashboard' %}">📊 Dashboard</a></li>
+        <li><a href="/elections/">🗳 Elections</a></li>
+        <li class="active"><a href="/candidates/">👤 Candidates</a></li>
+        <li><a href="/alerts/">⚠ Alerts</a></li>
+        <li><a href="/analytics/">📈 Analytics</a></li>
+        <li><a href="/reports/">🔍 Reports</a></li>
+        <li><a href="{% url 'logout' %}">🚪 Logout</a></li>
+    </ul>
+</div>
+
+<div class="main">
+    <div class="topbar">
+        <h1>👤 Candidate Roster</h1>
+    </div>
+
+    <!-- Client-side filter UI -->
+    <div class="filter-bar">
+        <button class="filter-btn active" onclick="filterCandidates('all')">All Parties</button>
+        {% for party in parties %}
+            <button class="filter-btn" onclick="filterCandidates('{{ party }}')">{{ party }}</button>
+        {% endfor %}
+    </div>
+
+    <div class="grid-container" id="candidateGrid">
+        {% for c in candidates %}
+            <div class="glass-card candidate-item" data-party="{{ c.candidate__party }}">
+                <div class="avatar-row">
+                    <div class="avatar-circle">
+                        {{ c.initials }}
+                    </div>
+                    <div>
+                        <h3 style="margin: 0; color: white;">{{ c.candidate__name }}</h3>
+                        <p style="margin: 3px 0 0 0; color: #94a3b8; font-size: 14px;">{{ c.candidate__party }}</p>
+                    </div>
+                </div>
+
+                <div class="stat-list">
+                    <div class="stat-item">
+                        <span>Current Rank</span>
+                        <span style="color: var(--accent-orange);">#{{ c.rank }}</span>
+                    </div>
+                    <div class="stat-item">
+                        <span>Total Votes</span>
+                        <span>{{ c.total_votes }}</span>
+                    </div>
+                    <div class="stat-item">
+                        <span>Vote Share</span>
+                        <span>{{ c.percentage }}%</span>
+                    </div>
+                </div>
+
+                <div class="tracker-container">
+                    <!-- Tracker max width scaled to percentage -->
+                    <div class="tracker-bar" style="width: {{ c.percentage }}%;"></div>
+                </div>
+            </div>
+        {% empty %}
+            <p style="color: #94a3b8; text-align: center; width: 100%; grid-column: 1 / -1;">No candidates registered.</p>
+        {% endfor %}
+    </div>
+</div>
+
+<script>
+    function filterCandidates(partyName) {
+        // Update active button state
+        document.querySelectorAll('.filter-btn').forEach(btn => btn.classList.remove('active'));
+        event.target.classList.add('active');
+
+        // Filter cards
+        const items = document.querySelectorAll('.candidate-item');
+        items.forEach(item => {
+            if (partyName === 'all' || item.dataset.party === partyName) {
+                item.style.display = 'flex';
+            } else {
+                item.style.display = 'none';
+            }
+        });
+    }
+</script>
+
+</body>
+</html>

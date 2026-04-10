@@ -1,0 +1,79 @@
+{% load static %}
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Elections Showcase</title>
+    <link rel="stylesheet" href="{% static 'core/css/dashboard.css' %}">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+
+<div class="sidebar">
+    <h2>Election Monitor</h2>
+    <ul>
+        <li><a href="{% url 'dashboard' %}">📊 Dashboard</a></li>
+        <li class="active"><a href="/elections/">🗳 Elections</a></li>
+        <li><a href="/candidates/">👤 Candidates</a></li>
+        <li><a href="/alerts/">⚠ Alerts</a></li>
+        <li><a href="/analytics/">📈 Analytics</a></li>
+        <li><a href="/reports/">🔍 Reports</a></li>
+        <li><a href="{% url 'logout' %}">🚪 Logout</a></li>
+    </ul>
+</div>
+
+<div class="main">
+    <div class="topbar">
+        <h1>🗳 Election Showcase Hub</h1>
+    </div>
+
+    <div class="grid-container">
+        {% for item in elections_data %}
+            <div class="glass-card">
+                <div>
+                    <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+                        <h2 style="margin-top: 0; margin-bottom: 10px; font-size: 22px; color: var(--accent-blue);">{{ item.election.name }}</h2>
+                        
+                        {% if item.status == 'Active' %}
+                            <span class="badge badge-active">🟢 Active</span>
+                        {% elif item.status == 'Upcoming' %}
+                            <span class="badge badge-upcoming">🕒 Upcoming</span>
+                        {% else %}
+                            <span class="badge badge-completed">✓ Completed</span>
+                        {% endif %}
+                    </div>
+                    
+                    <p style="color: #94a3b8; font-size: 13px; margin: 0 0 20px 0;">
+                        🗓 {{ item.election.start_date|date:"M d, Y" }} — {{ item.election.end_date|date:"M d, Y" }}
+                    </p>
+
+                    <div class="tracker-container">
+                        <div class="tracker-bar" style="width: {{ item.progress }}%;"></div>
+                    </div>
+                </div>
+
+                <div class="stat-list">
+                    <div class="stat-item">
+                        <span>Total Candidates</span>
+                        <span>{{ item.candidates_count }}</span>
+                    </div>
+                    <div class="stat-item">
+                        <span>Total Votes Cast</span>
+                        <span>{{ item.total_votes }}</span>
+                    </div>
+                    <div class="stat-item">
+                        <span>Active Alerts</span>
+                        <span {% if item.alerts_count > 0 %}style="color: var(--accent-red);"{% else %}style="color: #34d399;"{% endif %}>
+                            {{ item.alerts_count }}
+                        </span>
+                    </div>
+                </div>
+            </div>
+        {% empty %}
+            <p style="color: #94a3b8; text-align: center; width: 100%; grid-column: 1 / -1;">No elections configured currently.</p>
+        {% endfor %}
+    </div>
+
+</div>
+
+</body>
+</html>
