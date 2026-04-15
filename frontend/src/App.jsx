@@ -111,9 +111,9 @@ const Sidebar = () => {
     { name: 'Alerts', path: '/alerts', icon: AlertTriangle },
     { name: 'Analytics', path: '/analytics', icon: BarChart3 },
     { name: 'Reports', path: '/reports', icon: FileText },
-    { name: 'Create Account', path: '/create-account', icon: UserPlus, adminOnly: false },
     { name: 'Audit Logs', path: '/audit-logs', icon: ShieldCheck, adminOnly: true },
     { name: 'Admin Panel', path: '/admin/', icon: ShieldCheck, adminOnly: true },
+    { name: 'Create Account', path: '/create-account', icon: UserPlus, hideIfAuth: true },
     { name: 'Login', path: '/login', icon: ShieldCheck, hideIfAuth: true }
   ];
 

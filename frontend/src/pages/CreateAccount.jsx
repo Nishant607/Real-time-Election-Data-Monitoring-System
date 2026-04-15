@@ -30,6 +30,9 @@ const CreateAccount = () => {
       });
 
       if (error) throw error;
+      
+      // Immediately sign out to prevent Supabase's default auto-login on signup
+      await supabase.auth.signOut();
 
       setStatus({ 
         type: 'success', 
@@ -127,35 +130,7 @@ const CreateAccount = () => {
                 </div>
               </div>
 
-              <div className="space-y-2">
-                <label className="text-[10px] font-black text-slate-500 uppercase tracking-[0.2em] ml-1">Clearance Level (Role)</label>
-                <div className="grid grid-cols-2 gap-4">
-                  <button
-                    type="button"
-                    onClick={() => setFormData({...formData, role: 'User'})}
-                    className={`py-4 rounded-2xl border flex flex-col items-center justify-center gap-2 transition-all ${
-                      formData.role === 'User' 
-                        ? 'bg-blue-600/10 border-blue-500 text-blue-400 shadow-[0_0_20px_rgba(37,99,235,0.15)]' 
-                        : 'bg-black/40 border-white/5 text-slate-500 hover:border-white/10 hover:text-slate-300'
-                    }`}
-                  >
-                    <User size={24} />
-                    <span className="text-xs font-black uppercase tracking-wider">Standard Operator</span>
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => setFormData({...formData, role: 'Admin'})}
-                    className={`py-4 rounded-2xl border flex flex-col items-center justify-center gap-2 transition-all ${
-                      formData.role === 'Admin' 
-                        ? 'bg-indigo-600/10 border-indigo-500 text-indigo-400 shadow-[0_0_20px_rgba(99,102,241,0.15)]' 
-                        : 'bg-black/40 border-white/5 text-slate-500 hover:border-white/10 hover:text-slate-300'
-                    }`}
-                  >
-                    <ShieldCheck size={24} />
-                    <span className="text-xs font-black uppercase tracking-wider">Administrator</span>
-                  </button>
-                </div>
-              </div>
+              {/* Role selection has been removed by admin strategy - implicitly 'User' */}
 
               {/* Status Message */}
               <AnimatePresence>
