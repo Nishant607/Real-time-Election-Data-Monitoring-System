@@ -52,7 +52,8 @@ def run_simulator():
     if clear_data.lower() == 'y':
         clear_old_data()
 
-    print("[>>] Generating Live Action Stream (15 Seconds Animation)...\n")
+    input("\n[!] EXAMINER WAITING: Open your Live Dashboard in the browser now.\n[>>] PRESS THE 'ENTER' KEY HERE WHEN YOU ARE READY TO START THE LIVE STREAM... ")
+    print("\n[>>] Generating Live Action Stream (15 Seconds Animation)...\n")
     
     # 15 seconds long presentation loop
     TOTAL_TICKS = 15  
@@ -60,26 +61,28 @@ def run_simulator():
     # Start fake timestamps 3 hours ago to accommodate the data streaming
     sim_time = datetime.now(timezone.utc) - timedelta(hours=3)
     
-    candidate_1_id = 1
-    candidate_2_id = 2
+    # Fetch all candidates dynamically so anyone added gets votes!
+    candidates_list = supabase_request("candidates?select=id,name")
+    if not candidates_list:
+        print("[!] Error, no candidates found. Please add candidates first.")
+        return
+        
+    candidate_ids = [c['id'] for c in candidates_list]
     
-    totals = {
-        candidate_1_id: 3000, # Base votes to grow from
-        candidate_2_id: 3000
-    }
+    totals = {cid: 3000 for cid in candidate_ids}
     
-    # Precise mapped ticks for Fraud Demonstrations
+    # Distribute fraud randomly to make it look realistic for any number of candidates
     fraud_ticks = {
-        4: candidate_1_id,
-        8: candidate_2_id,
-        12: candidate_1_id,
-        14: candidate_2_id
+        4: candidate_ids[0 % len(candidate_ids)],
+        8: candidate_ids[1 % len(candidate_ids)],
+        12: candidate_ids[0 % len(candidate_ids)],
+        14: candidate_ids[2 % len(candidate_ids)] if len(candidate_ids) > 2 else candidate_ids[1 % len(candidate_ids)]
     }
     
     dataset = []
 
-    print("[System]: Submitting Base Floor of 3000 Votes To Avoid DB Math Errors...")
-    for cid in [candidate_1_id, candidate_2_id]:
+    print(f"[System]: Submitting Base Floor of 3000 Votes for {len(candidate_ids)} candidates To Avoid DB Math Errors...")
+    for cid in candidate_ids:
         supabase_request("vote_records", method="POST", data={
             "candidate_id": cid,
             "votes": totals[cid],
@@ -94,7 +97,7 @@ def run_simulator():
         # So we bypass the `time_diff < 60` database alarm for normal traffic
         sim_time += timedelta(seconds=75)
         
-        for cid in [candidate_1_id, candidate_2_id]:
+        for cid in candidate_ids:
             is_fraud = False
             desc = "Organic Growth"
             
@@ -120,7 +123,8 @@ def run_simulator():
             dataset.append((cid, totals[cid], is_fraud, desc))
             sim_time += timedelta(seconds=2)
             
-        print(f" [Tick {tick:02d}/15] Streaming Live Votes -> Cand 1: {totals[candidate_1_id]}, Cand 2: {totals[candidate_2_id]}")
+        status_str = ", ".join([f"Cand {cid}: {totals[cid]}" for cid in candidate_ids])
+        print(f" [Tick {tick:02d}/15] Streaming Live Votes -> {status_str}")
         
         # Real-time physical delay to run exactly across exactly ~15 seconds inside terminal
         time.sleep(1)
@@ -134,8 +138,8 @@ def run_simulator():
             writer.writerow(row)
 
     print(f"\n[✔] Live Demo Completed!")
-    print(f"Cand 1 Final Tally: {totals[candidate_1_id]}")
-    print(f"Cand 2 Final Tally: {totals[candidate_2_id]}")
+    for cid in candidate_ids:
+        print(f"Cand ID {cid} Final Tally: {totals[cid]}")
     print(f"You can now review the anomalies and exact final logic on the Dashboard.")
 
 if __name__ == '__main__':

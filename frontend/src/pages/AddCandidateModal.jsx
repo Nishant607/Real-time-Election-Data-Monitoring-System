@@ -37,7 +37,13 @@ const AddCandidateModal = ({ isOpen, onClose, onRefresh }) => {
     setError('');
     
     try {
-      await candidateService.create(formData);
+      const payload = {
+        name: formData.name,
+        party: formData.party,
+        election_id: formData.election
+      };
+      
+      await candidateService.create(payload);
       setSuccess(true);
       setTimeout(() => {
         onRefresh();

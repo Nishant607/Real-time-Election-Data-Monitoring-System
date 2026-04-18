@@ -4,7 +4,7 @@ import { motion } from 'framer-motion';
 import { useAuth } from '../services/AuthContext';
 import { exportService } from '../services/api';
 import jsPDF from 'jspdf';
-import 'jspdf-autotable';
+import autoTable from 'jspdf-autotable';
 
 const ReportCard = ({ title, description, icon: Icon, color, onDownload, actionText, restricted, index, loading }) => {
   return (
@@ -76,7 +76,7 @@ const ReportsHub = () => {
       const doc = new jsPDF();
       doc.text("Election Vote Report", 14, 20);
       
-      doc.autoTable({
+      autoTable(doc, {
         startY: 30,
         head: [['Candidate', 'Party', 'Total Votes']],
         body: tableData,
@@ -147,6 +147,41 @@ const ReportsHub = () => {
     }
   };
 
+  const handleExportVoterLogPDF = async () => {
+    if (!isAdmin) return;
+    setLoadState('voterLogPdf', true);
+    try {
+      const res = await exportService.getVoters();
+      
+      const doc = new jsPDF();
+      doc.text("Complete Voter Participation Log", 14, 20);
+      doc.setFontSize(10);
+      doc.text("Complete historical log of every vote stream recorded in the database.", 14, 26);
+      
+      const tableData = res.data.map(v => {
+        const date = new Date(v.timestamp).toLocaleString();
+        const cand = v.candidate?.name || 'Unknown';
+        const par = v.candidate?.party || 'Unknown';
+        return [date, cand, par, v.votes];
+      });
+
+      autoTable(doc, {
+        startY: 35,
+        head: [['Timestamp', 'Candidate', 'Party', 'Votes']],
+        body: tableData,
+        headStyles: { fillColor: [40, 40, 40] },
+        styles: { fontSize: 8 },
+      });
+      
+      doc.save('complete_vote_log.pdf');
+    } catch (e) {
+      console.error(e);
+      alert('Failed to export vote logs as PDF.');
+    } finally {
+      setLoadState('voterLogPdf', false);
+    }
+  };
+
   const handleExportNetworkHealth = () => {
     if (!isAdmin) return;
     const doc = new jsPDF();
@@ -154,7 +189,7 @@ const ReportsHub = () => {
     doc.setFontSize(10);
     doc.text("This report provides a status summary of the election monitoring network nodes and connectivity metrics.", 14, 30);
     
-    doc.autoTable({
+    autoTable(doc, {
       startY: 40,
       head: [['Metric', 'Status', 'Value']],
       body: [
@@ -248,6 +283,7 @@ const ReportsHub = () => {
         
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 relative z-10">
           {[
+            { name: 'Comprehensive Vote Ledger', type: 'PDF', desc: 'Complete historical vote logs', action: handleExportVoterLogPDF, key: 'voterLogPdf' },
             { name: 'Full Candidate Database', type: 'JSON', desc: 'Raw object mapping', action: handleExportCandidates, key: 'candidates' },
             { name: 'Voter Participation Log', type: 'CSV', desc: 'Regional metadata', action: handleExportVoters, key: 'voters' },
             { name: 'Anomalous Event Feed', type: 'WAV', desc: 'Vocalized audit', action: handleExportEvents, key: 'events' },

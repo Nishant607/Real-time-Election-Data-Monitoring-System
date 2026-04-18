@@ -41,9 +41,9 @@ export const activityLogService = {
 };
 
 export const exportService = {
-  getVoteReport: () => withData(supabase.from('vote_records').select('candidate:candidates(name, party), votes').eq('status', 'Approved')),
-  getCandidates: () => withData(supabase.from('candidates').select('id, name, party, election:elections(name)')),
-  getVoters: () => withData(supabase.from('vote_records').select('timestamp, votes, candidate:candidates(name, party, election:elections(name))').eq('status', 'Approved').order('timestamp', { ascending: false })),
+  getVoteReport: () => withData(supabase.from('vote_records').select('candidate:candidate_id(name, party), votes').eq('status', 'Approved')),
+  getCandidates: () => withData(supabase.from('candidates').select('id, name, party, election:election_id(name)')),
+  getVoters: () => withData(supabase.from('vote_records').select('timestamp, votes, candidate:candidate_id(name, party, election:election_id(name))').eq('status', 'Approved').order('timestamp', { ascending: false })),
 };
 
 export default supabase;

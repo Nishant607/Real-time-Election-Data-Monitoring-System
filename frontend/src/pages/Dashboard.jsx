@@ -83,12 +83,16 @@ const Dashboard = () => {
     const electionsSub = supabase.channel('custom-elections-channel')
       .on(
         'postgres_changes', 
-        { event: '*', schema: 'public', table: 'elections' }, 
+        { event: '*', schema: 'public', table: 'vote_records' }, 
         () => fetchDashboardData()
       )
       .subscribe();
 
+    // Polling fallback to guarantee live updates for Viva
+    const pollInterval = setInterval(fetchDashboardData, 1500);
+
     return () => {
+      clearInterval(pollInterval);
       supabase.removeChannel(activitySub);
       supabase.removeChannel(electionsSub);
     };

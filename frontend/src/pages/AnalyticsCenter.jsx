@@ -45,12 +45,16 @@ const AnalyticsCenter = () => {
     const votesSub = supabase.channel('analytics-votes-channel')
       .on(
         'postgres_changes',
-        { event: '*', schema: 'public', table: 'votes' },
+        { event: '*', schema: 'public', table: 'vote_records' },
         () => fetchAnalytics()
       )
       .subscribe();
 
+    // Polling fallback to guarantee live updates for Viva
+    const pollInterval = setInterval(fetchAnalytics, 1500);
+
     return () => {
+      clearInterval(pollInterval);
       supabase.removeChannel(votesSub);
     };
   }, []);
